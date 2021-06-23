@@ -612,7 +612,7 @@ class CoreEdgeReactionModel:
                 pdep_network, new_species = new_object
                 new_reactions.extend(pdep_network.explore_isomer(new_species))
 
-                self.process_new_reactions(new_reactions, new_species, pdep_network, generate_thermo=False)
+                self.process_new_reactions(new_reactions, new_species, pdep_network)
 
             else:
                 raise TypeError('Unable to use object {0} to enlarge reaction model; expecting an object of class '
@@ -635,7 +635,7 @@ class CoreEdgeReactionModel:
                         if len(products) == 1 and products[0] == species:
                             new_reactions = network.explore_isomer(species)
 
-                            self.process_new_reactions(new_reactions, species, network, generate_thermo=False)
+                            self.process_new_reactions(new_reactions, species, network)
                             network.update_configurations(self)
                             index = 0
                             break
@@ -661,7 +661,7 @@ class CoreEdgeReactionModel:
                     # Identify a core species which was used to generate the reaction
                     # This is only used to determine the reaction direction for processing
                     spc = spcTuple[0]
-                    self.process_new_reactions(rxnList, spc, generate_thermo=False)
+                    self.process_new_reactions(rxnList, spc)
 
         ################################################################
         # Begin processing the new species and reactions
@@ -674,31 +674,6 @@ class CoreEdgeReactionModel:
         # Do thermodynamic filtering
         if not np.isinf(self.thermo_tol_keep_spc_in_edge) and self.new_species_list != []:
             self.thermo_filter_species(self.new_species_list)
-
-        # Generate kinetics of new reactions
-        if self.new_reaction_list:
-            logging.info('Generating kinetics for new reactions...')
-        for reaction in self.new_reaction_list:
-            # If the reaction already has kinetics (e.g. from a library),
-            # assume the kinetics are satisfactory
-            if reaction.kinetics is None:
-                self.apply_kinetics_to_reaction(reaction)
-
-        # For new reactions, convert ArrheniusEP to Arrhenius, and fix barrier heights.
-        # self.new_reaction_list only contains *actually* new reactions, all in the forward direction.
-        for reaction in self.new_reaction_list:
-            # convert KineticsData to Arrhenius forms
-            if isinstance(reaction.kinetics, KineticsData):
-                reaction.kinetics = reaction.kinetics.to_arrhenius()
-            #  correct barrier heights of estimated kinetics
-            if isinstance(reaction, TemplateReaction) or isinstance(reaction,
-                                                                    DepositoryReaction):  # i.e. not LibraryReaction
-                reaction.fix_barrier_height()  # also converts ArrheniusEP to Arrhenius.
-
-            if self.pressure_dependence and reaction.is_unimolecular():
-                # If this is going to be run through pressure dependence code,
-                # we need to make sure the barrier is positive.
-                reaction.fix_barrier_height(force_positive=True)
 
         # Update unimolecular (pressure dependent) reaction networks
         if self.pressure_dependence:
@@ -793,7 +768,7 @@ class CoreEdgeReactionModel:
         self.new_surface_spcs_loss = set()
         self.new_surface_rxns_loss = set()
 
-    def process_new_reactions(self, new_reactions, new_species, pdep_network=None, generate_thermo=True):
+    def process_new_reactions(self, new_reactions, new_species, pdep_network=None, generate_thermo=True, generate_kinetics=True):
         """
         Process a list of newly-generated reactions involving the new core
         species or explored isomer `new_species` in network `pdep_network`.
@@ -801,7 +776,7 @@ class CoreEdgeReactionModel:
         Makes a reaction and decides where to put it: core, edge, or PDepNetwork.
         """
         for rxn in new_reactions:
-            rxn, is_new = self.make_new_reaction(rxn, generate_thermo=generate_thermo)
+            rxn, is_new = self.make_new_reaction(rxn, generate_thermo=generate_thermo, generate_kinetics=generate_kinetics)
             if rxn is None:
                 # Skip this reaction because there was something wrong with it
                 continue
