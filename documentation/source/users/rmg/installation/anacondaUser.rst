@@ -21,7 +21,17 @@ Binary Installation Using Anaconda for Unix-Based Systems: Linux and Mac OSX
    Whenever you wish to use it you must first activate the environment::
     
     source activate rmg_env
-    
+
+#. Install and Link Julia dependencies ::
+
+    python -c "import pyrms; pyrms.install()"
+    ln -sfn $(which python-jl) $(which python)
+       
+    Note that this links your python to python-jl enabling calls to Julia through pyjulia. Occasionally programs will 
+    interact with python-jl differently than the default python. If this occurs for you we recommend doing that operation
+    in a different conda environment. However, if convenient you can undo this linking by replacing python-jl with 
+    python3 in the second command above. Just make sure to rerun the linking command once you are done. 
+       
 #. Optional: If you wish to use the :ref:`QMTP interface <qm>` with `MOPAC <http://openmopac.net/>`_ to run quantum mechanical calculations for improved thermochemistry estimates of cyclic species, please obtain a legal license through the `MOPAC License Request Form <http://openmopac.net/form.php>`_.  Once you have it, type the following into your terminal ::
     
     mopac password_string_here

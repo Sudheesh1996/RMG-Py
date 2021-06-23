@@ -65,15 +65,28 @@ Installation by Source Using Anaconda Environment for Unix-based Systems: Linux 
 
     source ~/.zshrc
 
-#. Compile RMG-Py after activating the conda environment ::
+#. Activate conda environment ::
 
     conda activate rmg_env
-    make
+    
+    Note regarding differences between conda versions: Prior to Anaconda 4.4, the command to activate an environment was
+    ``source activate rmg_env``. It has since been changed to ``conda activate rmg_env`` due to underlying changes to
+    standardize operation across different operating systems. However, a prerequisite to using the new syntax is having
+    run the ``conda init`` setup routine, which can be done at the end of the install procedure if the user requests.
+    
+#. Install and Link Julia dependencies ::
 
-   Note regarding differences between conda versions: Prior to Anaconda 4.4, the command to activate an environment was
-   ``source activate rmg_env``. It has since been changed to ``conda activate rmg_env`` due to underlying changes to
-   standardize operation across different operating systems. However, a prerequisite to using the new syntax is having
-   run the ``conda init`` setup routine, which can be done at the end of the install procedure if the user requests.
+   python -c "import pyrms; pyrms.install()"
+   ln -sfn $(which python-jl) $(which python)
+   
+   Note that this links your python to python-jl enabling calls to Julia through pyjulia. Occasionally programs will 
+   interact with python-jl differently than the default python. If this occurs for you we recommend doing that operation
+   in a different conda environment. However, if convenient you can undo this linking by replacing python-jl with 
+   python3 in the second command above. Just make sure to rerun the linking command once you are done. 
+   
+#. Compile RMG-Py after activating the conda environment ::
+
+    make
 
 #. Modify environment variables. Add RMG-Py to the PYTHONPATH to ensure that you can access RMG modules from any folder.
    Also, add your RMG-Py folder to PATH to launch ``rmg.py`` from any folder.
