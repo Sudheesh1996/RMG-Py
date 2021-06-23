@@ -263,7 +263,9 @@ class RMG(util.Subject):
 
         if self.surface_site_density:
             self.reaction_model.surface_site_density = self.surface_site_density
-
+            self.reaction_model.core.phase_system.phases["Surface"].site_density = self.surface_site_density.value_si()
+            self.reaction_model.edge.phase_system.phases["Surface"].site_density = self.surface_site_density.value_si()
+            
         self.reaction_model.verbose_comments = self.verbose_comments
         self.reaction_model.save_edge_species = self.save_edge_species
 
