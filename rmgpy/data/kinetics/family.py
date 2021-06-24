@@ -65,6 +65,7 @@ from rmgpy.tools.uncertainty import KineticParameterUncertainty
 
 ################################################################################
 
+
 class TemplateReaction(Reaction):
     """
     A Reaction object generated from a reaction family template. In addition
@@ -115,6 +116,7 @@ class TemplateReaction(Reaction):
         self.template = template
         self.estimator = estimator
         self.reverse = reverse
+        self.labeledAtoms = list()
 
     def __reduce__(self):
         """
