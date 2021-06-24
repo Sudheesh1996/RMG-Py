@@ -1791,7 +1791,7 @@ class KineticsFamily(Database):
         else:
             raise NotImplementedError("Not expecting template of type {}".format(type(struct)))
 
-    def generate_reactions(self, reactants, products=None, prod_resonance=True):
+    def generate_reactions(self, reactants, products=None, prod_resonance=True, delete_labels=True):
         """
         Generate all reactions between the provided list of one, two, or three
         `reactants`, which should be either single :class:`Molecule` objects
@@ -1805,7 +1805,9 @@ class KineticsFamily(Database):
             reactants (list):                List of Molecules to react.
             products (list, optional):       List of Molecules or Species of desired product structures.
             prod_resonance (bool, optional): Flag to generate resonance structures for product checking.
-                Defaults to True, resonance structures are compared.
+                                             Defaults to ``True``, resonance structures are compared.
+            delete_labels (bool, optional):  Delete the labeled atoms from each generated reaction (optional).
+                                             Default is ``True``, atom labels are deleted.
 
         Returns:
             List of all reactions containing Molecule objects with the
@@ -1816,12 +1818,14 @@ class KineticsFamily(Database):
 
         # Forward direction (the direction in which kinetics is defined)
         reaction_list.extend(
-            self._generate_reactions(reactants, products=products, forward=True, prod_resonance=prod_resonance))
+            self._generate_reactions(reactants, products=products, forward=True,
+                                     prod_resonance=prod_resonance, delete_labels=delete_labels))
 
         if not self.own_reverse and self.reversible:
             # Reverse direction (the direction in which kinetics is not defined)
             reaction_list.extend(
-                self._generate_reactions(reactants, products=products, forward=False, prod_resonance=prod_resonance))
+                self._generate_reactions(reactants, products=products, forward=False,
+                                         prod_resonance=prod_resonance, delete_labels=delete_labels))
 
         return reaction_list
 
@@ -1986,7 +1990,7 @@ class KineticsFamily(Database):
         return reactions[0].degeneracy
 
     def _generate_reactions(self, reactants, products=None, forward=True, prod_resonance=True,
-                            react_non_reactive=False):
+                            react_non_reactive=False, delete_labels=True):
         """
         Generate a list of all the possible reactions of this family between
         the list of `reactants`. The number of reactants provided must match
@@ -1999,14 +2003,16 @@ class KineticsFamily(Database):
         found using `rmgpy.data.kinetics.common.find_degenerate_reactions`.
 
         Args:
-            reactants:          List of Molecules to react
-            products:           List of Molecules or Species of desired product structures (optional)
-            forward:            Flag to indicate whether the forward or reverse template should be applied (optional)
-                                Default is True, forward template is used
-            prod_resonance:     Flag to generate resonance structures for product checking (optional)
-                                Default is True, resonance structures are compared
-            react_non_reactive: Flag to generate reactions between unreactive molecules (optional)
-                                Default is False, reactions involving unreactive molecules are not generated
+            reactants:          List of Molecules to react.
+            products:           List of Molecules or Species of desired product structures (optional).
+            forward:            Flag to indicate whether the forward or reverse template should be applied (optional).
+                                Default is ``True``, forward template is used.
+            prod_resonance:     Flag to generate resonance structures for product checking (optional).
+                                Default is ``True``, resonance structures are compared.
+            react_non_reactive: Flag to generate reactions between unreactive molecules (optional).
+                                Default is ``False``, reactions involving unreactive molecules are not generated.
+            delete_labels:      Delete the labeled atoms from each generated reaction (optional).
+                                Default is ``True``, atom labels are deleted.
 
         Returns:
             List of all reactions containing Molecule objects with the
@@ -2378,8 +2384,9 @@ class KineticsFamily(Database):
             for species in itertools.chain(reaction.reactants, reaction.products):
                 species.clear_labeled_atoms()
 
-            # We're done with the labeled atoms, so delete the attribute
-            del reaction.labeledAtoms
+            if delete_labels:
+                # We're done with the labeled atoms, so delete the attribute
+                del reaction.labeledAtoms
 
             # Mark reaction reversibility
             reaction.reversible = self.reversible
