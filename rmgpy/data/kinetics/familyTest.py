@@ -703,9 +703,9 @@ class TestTreeGeneration(unittest.TestCase):
         self.family.clean_tree()
         ents = [ent for ent in self.family.groups.entries.values() if ent.index != -1]
         self.assertEqual(len(ents), 1,
-                          'more than one relevant group left in groups after preparing tree for generation')
+                         'more than one relevant group left in groups after preparing tree for generation')
         self.assertEqual(len(self.family.rules.entries), 1,
-                          'more than one group in rules.entries after preparing tree for generation')
+                         'more than one group in rules.entries after preparing tree for generation')
         root = self.family.groups.entries[list(self.family.rules.entries.keys())[0]]
         self.assertEqual([root], self.family.forward_template.reactants)
         self.assertEqual([root], self.family.groups.top)
@@ -830,8 +830,9 @@ class TestGenerateReactions(unittest.TestCase):
             thermo_libraries=[],
             reaction_libraries=[],
             kinetics_families=['H_Abstraction', 'R_Addition_MultipleBond', 'Singlet_Val6_to_triplet', 'R_Recombination',
-                              'Baeyer-Villiger_step1_cat', 'Surface_Adsorption_Dissociative', 'Surface_Abstraction_vdW',
-                              'Surface_Dissociation_vdW', 'intra_H_migration'],
+                               'Baeyer-Villiger_step1_cat', 'Surface_Adsorption_Dissociative',
+                               'Surface_Abstraction_vdW',
+                               'Surface_Dissociation_vdW', 'intra_H_migration'],
             depository=False,
             solvation=False,
             surface=False,
@@ -869,11 +870,11 @@ class TestGenerateReactions(unittest.TestCase):
 
     def test_molecule_forbidden(self):
 
-        forbidden_mol = Molecule(smiles='*CC.[*]') # vdw bidentate
+        forbidden_mol = Molecule(smiles='*CC.[*]')  # vdw bidentate
 
-        mol1 = Molecule(smiles='*CC*') # bidentate
-        mol2 = Molecule(smiles='C.*') # vdw
-        mol3 = Molecule(smiles='CC*') # chemisorbed
+        mol1 = Molecule(smiles='*CC*')  # bidentate
+        mol2 = Molecule(smiles='C.*')  # vdw
+        mol3 = Molecule(smiles='CC*')  # chemisorbed
 
         fam = self.database.kinetics.families['Surface_Dissociation_vdW']
         self.assertTrue(fam.is_molecule_forbidden(forbidden_mol))
@@ -1070,9 +1071,9 @@ multiplicity 2
         Test that the multiplicity check is working correctly in the apply_recipe function
         """
         family = self.database.kinetics.families['Surface_Abstraction_vdW']
-        reacts = [Molecule(smiles='*[CH2]'),Molecule(smiles='*[CH2]')]
+        reacts = [Molecule(smiles='*[CH2]'), Molecule(smiles='*[CH2]')]
         reaction_list = family.generate_reactions(reacts)
-        self.assertEqual(len(reaction_list),0)
+        self.assertEqual(len(reaction_list), 0)
 
     def test_retaining_atom_labels_in_template_reaction(self):
         """
@@ -1086,7 +1087,9 @@ multiplicity 2
         self.assertTrue(hasattr(reaction_list_2[0], 'labeledAtoms'))
         self.assertEqual([atom_tuple[0] for atom_tuple in reaction_list_2[0].labeledAtoms], ['*2', '*1', '*3'])
 
+
 ################################################################################
+
 
 if __name__ == '__main__':
     unittest.main(testRunner=unittest.TextTestRunner(verbosity=2))
