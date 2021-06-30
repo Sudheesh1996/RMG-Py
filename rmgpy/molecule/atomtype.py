@@ -350,6 +350,7 @@ ATOMTYPES['Ct'] = AtomType('Ct', generic=['R', 'R!H', 'R!H!Val7', 'C', 'Val4'], 
 # examples for Ct: C#C, C#N
 ATOMTYPES['Ctc'] = AtomType('Ctc', generic=['R', 'R!H', 'R!H!Val7', 'C', 'Val4'], specific=[],  # (shared electrons = 6)
                             single=[0], all_double=[0], r_double=[0], o_double=[0], s_double=[0], triple=[1], quadruple=[], benzene=[0], lone_pairs=[0], charge=[+1])
+# examples for Ctc: [C+]#[C-]
 ATOMTYPES['Cb'] = AtomType('Cb', generic=['R', 'R!H', 'R!H!Val7', 'C', 'Val4'], specific=[],
                            single=[0,1], all_double=[0], r_double=[], o_double=[], s_double=[], triple=[0], quadruple=[], benzene=[1, 2], lone_pairs=[], charge=[])
 # examples for Cb: benzene (C6H6)
